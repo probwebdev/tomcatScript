@@ -5,7 +5,7 @@ LINK="$2"
 
 #function that stopping tomcat service
 function serviceStop {
-    initctl stop tomcat
+    systemctl stop tomcat.service
     echo Service stoped. Continue...
 }
 
@@ -38,11 +38,12 @@ function install {
     serviceStop
     download
     groupadd tomcat
-    useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+    useradd -M -s /bin/nologin -g tomcat -d /opt/tomcat tomcat
     permissions
-    cp init/tomcat.conf /etc/init/
-    initctl reload-configuration
-    initctl start tomcat
+    cp init/tomcat.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl start tomcat
+    systemctl enable tomcat
     exit 0
 }
 
@@ -52,7 +53,7 @@ function update {
     download
     cp -r /opt/tomcat.bak/webapps /opt/tomcat/
     permissions
-    initctl start tomcat
+    systemctl start tomcat
     exit 0
 }
 
@@ -63,7 +64,8 @@ function delete {
     userdel tomcat
     rm -r /opt/tomcat
     rm -r /opt/tomcat.bak
-    rm /etc/init/tomcat.conf
+    systemctl disable tomcat
+    rm /etc/systemd/system/tomcat.service
     exit 0
 }
 
