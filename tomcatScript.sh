@@ -117,6 +117,30 @@ function delete {
 	esac
 }
 
+# This function is used to restore previous installation
+function restore {
+    serviceStop
+    if [ -d /opt/tomcat.backup ]; then
+        if [ -d /opt/tomcat ]; then
+            mv /opt/tomcat /opt/tomcat.broken
+            cp -r /opt/tomcat.backup /opt/tomcat
+            permissions
+            initctl start tomcat
+            echo "Previous Tomcat installation restored"
+            exit 0
+        else
+            cp -r /opt/tomcat.backup /opt/tomcat
+            permissions
+            initctl start tomcat
+            echo "Previous Tomcat installation restored"
+            exit 0
+        fi
+    else
+        echo "Backup directory is missing! Abort..."
+        exit 0
+    fi
+}
+
 # case construction that decides what action will be used, e.g
 # installation, update or deletion
 if [[ $(id -u) = "0" ]]; then
@@ -129,6 +153,9 @@ if [[ $(id -u) = "0" ]]; then
         ;;
         -d)
             delete
+        ;;
+        -r)
+            restore
         ;;
         *)
             echo "Use -i URL to install, -u URL to update, -d to delete"
