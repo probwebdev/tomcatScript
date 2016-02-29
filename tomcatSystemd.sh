@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Variables for passed arguments
-# key is for action, ie -i to install, -u to update, -d to delete
-# url is for url to download Tomcat
-key="$1"
+# arg is for action, i.e -i to install, -u to update, -d to delete
+# url is for URL to download Tomcat
+arg="$1"
 url="$2"
 
 # This function is used to stop tomcat service before update or deletion
@@ -121,7 +121,7 @@ function delete {
 # case construction that decides what action will be used, e.g
 # installation, update or deletion
 if [[ $(id -u) = "0" ]]; then
-    case $key in
+    case $arg in
         -i)
             install
         ;;
