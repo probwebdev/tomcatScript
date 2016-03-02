@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables for passed arguments
-# arg is for action, i.e -i to install, -u to update, -d to delete
+# arg is for argument, i.e -i to install, -u to update, -r to restore, -d to delete
 # url is for URL to download Tomcat
 arg="$1"
 url="$2"
@@ -88,12 +88,11 @@ function update {
 
 # This function is used for complete removal of Tomcat from the system
 function delete {
-    read -p "Are you sure you want to completely remove Tomcat (also backup)? y(Y) or n(N) : " INPUT
+    read -p "Are you sure you want to completely remove Tomcat (with backup dir)? y(Y) or n(N) : " INPUT
 	case $INPUT in
 		[Yy]* )
             systemctl disable tomcat
             serviceStop
-            systemctl daemon-reload
             echo "Deleting user tomcat..."
             userdel tomcat
             echo "Deleting tomcat dirs..."
@@ -105,6 +104,7 @@ function delete {
             fi
             echo "Deleteing tomcat init script..."
             rm /etc/systemd/system/tomcat.service
+            systemctl daemon-reload
             echo "Finished"
             exit 0
         ;;
@@ -144,7 +144,7 @@ function restore {
 }
 
 # case construction that decides what action will be used, e.g
-# installation, update or deletion
+# installation, update, restore or deletion
 if [[ $(id -u) = "0" ]]; then
     case $arg in
         -i)
